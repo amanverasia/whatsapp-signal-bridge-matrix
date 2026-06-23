@@ -1,4 +1,4 @@
-// src/index.js
+import 'dotenv/config';
 import { loadConfig } from './config.js';
 import { createLogger } from './logging.js';
 import { IdMap } from './bridge/idMap.js';
