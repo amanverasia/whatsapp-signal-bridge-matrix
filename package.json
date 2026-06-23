@@ -1,0 +1,18 @@
+{
+  "name": "whatsapp-signal-bridge",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Bidirectional text bridge between WhatsApp and Signal groups",
+  "scripts": {
+    "start": "node src/index.js",
+    "discover": "node src/index.js --discover",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "@whiskeysockets/baileys": "^6.7.0",
+    "@hapi/boom": "^10.0.1",
+    "dotenv": "^16.4.5",
+    "libphonenumber-js": "^1.11.4",
+    "p-queue": "^8.0.1"
+  }
+}
