@@ -1,5 +1,6 @@
 import makeWASocket, { useMultiFileAuthState, DisconnectReason } from '@whiskeysockets/baileys';
 import { Boom } from '@hapi/boom';
+import qrcode from 'qrcode-terminal';
 
 export class WhatsAppClient {
   constructor({ authDir, groupJid, log }) {
@@ -16,23 +17,32 @@ export class WhatsAppClient {
 
   async start() {
     const { state, saveCreds } = await useMultiFileAuthState(this.authDir);
-    this.sock = makeWASocket({ auth: state, printQRInTerminal: true, logger: { level: 'silent' } });
+    this.sock = makeWASocket({
+      auth: state,
+      logger: {
+        child: () => ({ level: 'silent', info: () => {}, debug: () => {}, warn: () => {}, error: () => {}, trace: () => {}, fatal: () => {}, silent: () => {} }),
+        level: 'silent',
+        info: () => {}, debug: () => {}, warn: () => {}, error: () => {}, trace: () => {}, fatal: () => {}, silent: () => {}
+      }
+    });
     this.sock.ev.on('creds.update', saveCreds);
 
     this.sock.ev.on('connection.update', (update) => {
-      const { connection, lastDisconnect } = update;
+      const { connection, lastDisconnect, qr } = update;
+      if (qr) {
+        console.log('\nScan this QR code in WhatsApp (Linked Devices > Link a Device):');
+        qrcode.generate(qr, { small: true });
+      }
       if (connection === 'open') {
         this.log.info('[whatsapp] connected');
       } else if (connection === 'close') {
-        const shouldReconnect = lastDisconnect?.error instanceof Boom
-          ? lastDisconnect.error.output.statusCode !== DisconnectReason.loggedOut
-          : true;
-        this.log.warn(`[whatsapp] connection closed, reconnect=${shouldReconnect}`);
+        const statusCode = lastDisconnect?.error?.output?.statusCode;
+        const shouldReconnect = !(lastDisconnect?.error instanceof Boom) || statusCode !== DisconnectReason.loggedOut;
+        this.log.warn(`[whatsapp] closed (status=${statusCode}, reconnect=${shouldReconnect})`);
         if (!shouldReconnect) {
-          this.log.error('[whatsapp] logged out! Session invalid. Re-scan QR.');
+          this.log.error('[whatsapp] logged out! Session invalid.');
           process.exit(1);
         }
-        this.start();
       }
     });
 
@@ -44,7 +54,6 @@ export class WhatsAppClient {
       for (const update of updates) this._handleMessageUpdate(update);
     });
   }
-
   _handleIncomingMessage(msg) {
     if (!msg.message) return;
     const jid = msg.key.remoteJid;
@@ -52,10 +61,14 @@ export class WhatsAppClient {
     if (msg.key.fromMe) return;
     const text = msg.message.conversation || msg.message.extendedTextMessage?.text || null;
     if (!text) return;
+
+    let senderPhone = String(msg.key.participantAlt || msg.key.participant || jid).replace(/@.*$/, '');
+    if (!senderPhone.startsWith('+')) senderPhone = '+' + senderPhone;
+
     this._messageHandlers.forEach(h => h({
       id: msg.key.id, groupJid: jid,
       senderName: msg.pushName || null,
-      senderPhone: msg.key.participant || jid,
+      senderPhone,
       text, timestamp: msg.messageTimestamp,
     }));
   }

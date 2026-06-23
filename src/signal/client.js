@@ -27,12 +27,10 @@ export class SignalClient {
       this.socket.on('error', reject);
     });
     this.log.info('[signal] connected to signal-cli daemon');
-    await this._call('subscribe', { account: this.account });
-    this.log.info('[signal] subscribed to incoming messages');
   }
 
   async send(groupId, text) {
-    const result = await this._call('sendGroupMessage', { account: this.account, groupId, message: text });
+    const result = await this._call('send', { account: this.account, groupId, message: text });
     return { timestamp: result.timestamp };
   }
 
@@ -41,8 +39,8 @@ export class SignalClient {
   }
 
   async listGroups() {
-    const result = await this._call('getGroups', { account: this.account });
-    return result.groups || result;
+    const result = await this._call('listGroups', { account: this.account });
+    return Array.isArray(result) ? result : (result.groups || result);
   }
 
   _call(method, params) {

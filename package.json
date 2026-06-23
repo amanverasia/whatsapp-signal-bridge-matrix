@@ -9,9 +9,10 @@
     "test": "node --test"
   },
   "dependencies": {
-    "@whiskeysockets/baileys": "^6.7.0",
     "@hapi/boom": "^10.0.1",
+    "@whiskeysockets/baileys": "^7.0.0-rc13",
     "dotenv": "^16.4.5",
-    "libphonenumber-js": "^1.11.4"
+    "libphonenumber-js": "^1.11.4",
+    "qrcode-terminal": "^0.12.0"
   }
 }

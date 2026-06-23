@@ -20,7 +20,7 @@ export class SignalCliSpawn {
 
   _spawn() {
     return new Promise((resolve, reject) => {
-      const args = ['daemon', '--socket', this.socketPath, '--config', this.signalDataDir];
+      const args = ['daemon', '--socket', this.socketPath, '--receive-mode', 'on-connection'];
       this.log.info(`[signalCli] spawning: signal-cli ${args.join(' ')}`);
       this.child = spawn('signal-cli', args, { stdio: ['ignore', 'pipe', 'pipe'] });
 

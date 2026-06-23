@@ -21,15 +21,16 @@ async function discover(config, log) {
   const sig = new SignalClient({ socketPath: config.signalSocketPath, account: config.botPhone, groupId: config.signalGroupId, log });
   await sig.start();
 
+  // Allow time for connections to stabilize
   await new Promise(r => setTimeout(r, 3000));
 
-  console.log('\nWhatsApp groups you are in:');
+  console.log('WhatsApp groups you are in:');
   const waGroups = await wa.listGroups();
   for (const g of waGroups) console.log(`  - "${g.subject}"  JID: ${g.id}`);
 
   console.log('\nSignal groups you are in:');
   const sigGroups = await sig.listGroups();
-  for (const g of sigGroups) console.log(`  - "${g.name || g}"  ID: ${g.id || g}`);
+  for (const g of sigGroups) console.log(`  - "${g.name || JSON.stringify(g)}"  ID: ${g.id || g}`);
 
   console.log('\nCopy the relevant group IDs into your .env file.');
   wa.stop();
@@ -39,6 +40,11 @@ async function discover(config, log) {
 }
 
 async function main() {
+  if (process.argv.includes('--discover')) {
+    if (!process.env.WHATSAPP_GROUP_JID) process.env.WHATSAPP_GROUP_JID = 'discover-mode';
+    if (!process.env.SIGNAL_GROUP_ID) process.env.SIGNAL_GROUP_ID = 'discover-mode';
+  }
+
   const config = loadConfig();
   const log = createLogger(config.logLevel);
 
