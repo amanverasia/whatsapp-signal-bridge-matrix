@@ -66,7 +66,7 @@ Plain JavaScript (ES modules, Node 20+) — no build step, keeps v1 simple. Each
 ```
 whatsapp-signal-bridge-matrix/
 ├── package.json
-├── .gitignore                   # ignores config.local.json, data/, node_modules
+├── .gitignore                   # ignores .env, data/, node_modules
 ├── .env.example                 # template, committed
 ├── Dockerfile
 ├── src/
