@@ -15,7 +15,7 @@ async function discover(config, log) {
   const wa = new WhatsAppClient({ authDir: config.whatsappAuthDir, groupJid: config.whatsappGroupJid, log });
   await wa.start();
 
-  const signalCli = new SignalCliSpawn({ socketPath: config.signalSocketPath, signalDataDir: config.signalDataDir, log });
+  const signalCli = new SignalCliSpawn({ socketPath: config.signalSocketPath, signalDataDir: config.signalDataDir, noSpawn: config.signalNoSpawn, log });
   await signalCli.start();
 
   const sig = new SignalClient({ socketPath: config.signalSocketPath, account: config.botPhone, groupId: config.signalGroupId, log });
@@ -55,7 +55,7 @@ async function main() {
 
   log.info('[main] starting WhatsApp-Signal bridge');
 
-  const signalCli = new SignalCliSpawn({ socketPath: config.signalSocketPath, signalDataDir: config.signalDataDir, log });
+  const signalCli = new SignalCliSpawn({ socketPath: config.signalSocketPath, signalDataDir: config.signalDataDir, noSpawn: config.signalNoSpawn, log });
   await signalCli.start();
 
   const sig = new SignalClient({ socketPath: config.signalSocketPath, account: config.botPhone, groupId: config.signalGroupId, log });

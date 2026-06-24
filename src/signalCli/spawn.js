@@ -3,10 +3,11 @@ import { createConnection } from 'node:net';
 import { setTimeout as sleep } from 'node:timers/promises';
 
 export class SignalCliSpawn {
-  constructor({ socketPath, signalDataDir, log }) {
+  constructor({ socketPath, signalDataDir, log, noSpawn = false }) {
     this.socketPath = socketPath;
     this.signalDataDir = signalDataDir;
     this.log = log;
+    this.noSpawn = noSpawn;
     this.child = null;
     this.failures = [];
     this.maxFailures = 5;
@@ -14,13 +15,18 @@ export class SignalCliSpawn {
   }
 
   async start() {
+    if (this.noSpawn) {
+      this.log.info('[signalCli] skipping spawn (noSpawn mode), waiting for external daemon');
+      await this._waitForSocket();
+      return;
+    }
     await this._spawn();
     await this._waitForSocket();
   }
 
   _spawn() {
     return new Promise((resolve, reject) => {
-      const args = ['daemon', '--socket', this.socketPath, '--receive-mode', 'on-connection'];
+      const args = ['--config', this.signalDataDir, 'daemon', '--socket', this.socketPath, '--receive-mode', 'on-connection'];
       this.log.info(`[signalCli] spawning: signal-cli ${args.join(' ')}`);
       this.child = spawn('signal-cli', args, { stdio: ['ignore', 'pipe', 'pipe'] });
 

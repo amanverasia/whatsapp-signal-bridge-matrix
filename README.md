@@ -55,6 +55,16 @@ Messages appear as `Sender Name (+phone): message text`.
 
 ## Setup (Docker)
 
+### Option A: docker-compose (recommended)
+
+```bash
+cp .env.example .env
+# Edit .env with your values
+docker compose up -d
+```
+
+### Option B: plain Docker
+
 1. **Build:**
    ```bash
    docker build -t wa-signal-bridge .

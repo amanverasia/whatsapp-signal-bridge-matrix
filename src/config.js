@@ -22,6 +22,7 @@ export function loadConfig(env = process.env) {
     signalGroupId: env.SIGNAL_GROUP_ID,
     signalSocketPath: env.SIGNAL_SOCKET_PATH || '/tmp/signald.sock',
     signalDataDir: env.SIGNAL_DATA_DIR || './data/signal',
+    signalNoSpawn: env.SIGNAL_NO_SPAWN === 'true',
     whatsappAuthDir: env.WHATSAPP_AUTH_DIR || './data/auth_info',
     logLevel: env.LOG_LEVEL || 'info',
     circuitBreakerThreshold: parseInt(env.CIRCUIT_BREAKER_THRESHOLD || '50', 10),

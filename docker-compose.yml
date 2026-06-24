@@ -1,0 +1,12 @@
+services:
+  bridge:
+    build: .
+    container_name: wa-signal-bridge
+    env_file:
+      - .env
+    volumes:
+      - bridge-data:/app/data
+    restart: unless-stopped
+
+volumes:
+  bridge-data:
