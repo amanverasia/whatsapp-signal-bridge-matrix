@@ -43,6 +43,8 @@ export class WhatsAppClient {
           this.log.error('[whatsapp] logged out! Session invalid.');
           process.exit(1);
         }
+        this.log.info('[whatsapp] reconnecting in 5s...');
+        setTimeout(() => this.start().catch(err => this.log.error(`[whatsapp] reconnect failed: ${err.message}`)), 5000);
       }
     });
 
